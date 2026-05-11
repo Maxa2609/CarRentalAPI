@@ -17,10 +17,10 @@ namespace CarRentalAPI.Models
         public string LicensePlate { get; set; }
 
         public int BrandId { get; set; }
-        public virtual CarBrand Brand { get; set; }
+        public virtual CarBrand? Brand { get; set; }
 
         public int ClassId { get; set; }
-        public virtual CarClass CarClass { get; set; }
+        public virtual CarClass? CarClass { get; set; }
 
         public virtual ICollection<RentalOrder> RentalOrders { get; set; } = new List<RentalOrder>();
     }
