@@ -1,0 +1,93 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Car Rental - Каталог авто</title>
+    <link rel="stylesheet" href="css/site.css?v=2" />
+    <style>
+        .header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .car-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .car-card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            width: calc(50% - 10px);
+            box-sizing: border-box;
+        }
+
+            .car-card h2 {
+                margin-top: 0;
+                color: #2980b9;
+            }
+
+        .book-btn {
+            background-color: #2ecc71;
+            width: 100%;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔎 Каталог доступних автомобілів</h1>
+        </div>
+
+        <input type="text" id="searchInput" placeholder="Шукати за моделлю або маркою..." onkeyup="searchCars()">
+        <div id="carCatalog" class="car-grid"></div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <div id="bookingModal" class="modal">
+        <h2 style="margin-top: 0;">Оформлення оренди</h2>
+        <p id="bookingCarInfo" style="font-weight: bold; color: #2980b9;"></p>
+
+        <form action="javascript:void(0);" onsubmit="openPaymentModal()">
+            <input type="hidden" id="book-carId">
+            <input type="hidden" id="book-price">
+            <input type="text" id="cust-name" placeholder="Ваше ПІБ" required>
+            <input type="text" id="cust-license" placeholder="Водійське посвідчення" required>
+            <input type="text" id="cust-phone" placeholder="Контактний телефон" required>
+
+            <p style="margin-bottom: 5px; margin-top: 0;">Дата початку:</p>
+            <input type="date" id="rent-start" onchange="calculateTotal()" required>
+
+            <p style="margin-bottom: 5px; margin-top: 0;">Дата завершення:</p>
+            <input type="date" id="rent-end" onchange="calculateTotal()" required>
+
+            <h3 id="total-price-display">Сума до оплати: 0 грн</h3>
+
+            <input type="submit" value="Оплатити та забронювати" style="background:#2ecc71; width: 100%;">
+            <button type="button" onclick="closeBookingModal()" style="background:#e74c3c; width:100%; margin-top:10px;">Скасувати</button>
+        </form>
+    </div>
+
+    <div id="paymentModal" class="modal" style="max-width: 350px; text-align: center;">
+        <h2 style="margin-top: 0;">Оплата</h2>
+        <h3 id="paymentAmountText" style="color: #2980b9;">0 грн</h3>
+        <p>Підтвердження платежу через банк...</p>
+
+        <label style="cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; background: #f1f2f6; padding: 15px; border-radius: 5px;">
+            <input type="checkbox" id="mock-payment-check" style="width: 20px; height: 20px; margin: 0 10px 0 0;">
+            Оплата пройшла успішно
+        </label>
+
+        <button onclick="confirmPaymentAndBook()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Підтвердити</button>
+        <button onclick="closePaymentModal()" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <script src="js/client.js" asp-append-version="true"></script>
+</body>
+</html>

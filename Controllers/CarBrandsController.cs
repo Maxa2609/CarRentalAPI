@@ -20,14 +20,14 @@ namespace CarRentalAPI.Controllers
             _context = context;
         }
 
-        // GET: api/CarBrands
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<CarBrand>>> GetCarBrands()
         {
             return await _context.CarBrands.ToListAsync();
         }
 
-        // GET: api/CarBrands/5
+
         [HttpGet("{id}")]
         public async Task<ActionResult<CarBrand>> GetCarBrand(int id)
         {
@@ -41,8 +41,7 @@ namespace CarRentalAPI.Controllers
             return carBrand;
         }
 
-        // PUT: api/CarBrands/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutCarBrand(int id, CarBrand carBrand)
         {
@@ -72,8 +71,7 @@ namespace CarRentalAPI.Controllers
             return NoContent();
         }
 
-        // POST: api/CarBrands
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
         public async Task<ActionResult<CarBrand>> PostCarBrand(CarBrand carBrand)
         {
@@ -83,7 +81,7 @@ namespace CarRentalAPI.Controllers
             return CreatedAtAction("GetCarBrand", new { id = carBrand.Id }, carBrand);
         }
 
-        // DELETE: api/CarBrands/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCarBrand(int id)
         {

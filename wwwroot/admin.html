@@ -1,0 +1,57 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Вхід - Адміністратор</title>
+    <link rel="stylesheet" href="css/site.css" />
+    <style>
+        .login-box {
+            max-width: 400px;
+            margin: 100px auto;
+            text-align: center;
+        }
+
+            .login-box input[type="text"], .login-box input[type="password"] {
+                width: 100%;
+                margin-bottom: 15px;
+            }
+
+            .login-box input[type="submit"] {
+                width: 100%;
+            }
+
+        .error-msg {
+            color: #e74c3c;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container login-box">
+        <h2>🔒 Вхід до системи управління</h2>
+        <p id="errorMsg" class="error-msg">Невірний логін або пароль!</p>
+
+        <form action="javascript:void(0);" onsubmit="checkLogin()">
+            <input type="text" id="username" placeholder="Логін" required>
+            <input type="password" id="password" placeholder="Пароль" required>
+            <input type="submit" value="Увійти">
+        </form>
+    </div>
+
+    <script>
+        function checkLogin() {
+            const u = document.getElementById('username').value;
+            const p = document.getElementById('password').value;
+
+            if (u === 'admin' && p === 'p@ssw0rd') {
+                sessionStorage.setItem('adminToken', 'd7f8g9h0j1k2l3');
+                window.location.replace('admin_dashboard.html');
+            } else {
+                document.getElementById('errorMsg').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>

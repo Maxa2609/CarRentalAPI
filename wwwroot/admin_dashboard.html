@@ -1,0 +1,151 @@
+﻿<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Панель Менеджера</title>
+    <script>
+        if (sessionStorage.getItem('adminToken') !== 'd7f8g9h0j1k2l3') {
+            window.location.replace('Index.html');
+        }
+    </script>
+    <link rel="stylesheet" href="css/site.css?v=2" />
+    <style>
+        .dashboard-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 10px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background-color: #95a5a6;
+        }
+
+            .nav-btn.active {
+                background-color: #3498db;
+            }
+
+        .section {
+            display: none;
+        }
+
+            .section.active {
+                display: block;
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <h1>🛠️ Панель управління автопрокатом</h1>
+            <button onclick="logout()" style="background-color: #e74c3c;">Вийти</button>
+        </div>
+
+        <div class="dashboard-nav">
+            <button class="nav-btn active" onclick="switchTab('brands')">Марки авто</button>
+            <button class="nav-btn" onclick="switchTab('carclasses')">Класи авто</button>
+            <button class="nav-btn" onclick="switchTab('cars')">Автопарк</button>
+            <button class="nav-btn" onclick="switchTab('customers')">Клієнти</button>
+            <button class="nav-btn" onclick="switchTab('orders')">Замовлення</button>
+        </div>
+
+        <div id="brands" class="section active">
+            <button class="btn-add" onclick="openAddBrand()">➕ Додати марку</button>
+            <table>
+                <thead><tr><th>ID</th><th>Назва</th><th style="width:120px;">Дії</th></tr></thead>
+                <tbody id="brands-table"></tbody>
+            </table>
+        </div>
+
+        <div id="carclasses" class="section">
+            <button class="btn-add" onclick="openAddCarClass()">➕ Додати клас</button>
+            <table>
+                <thead><tr><th>ID</th><th>Клас</th><th>Ціна/день</th><th style="width:120px;">Дії</th></tr></thead>
+                <tbody id="classes-table"></tbody>
+            </table>
+        </div>
+
+        <div id="cars" class="section">
+            <button class="btn-add" onclick="openAddCar()">➕ Додати авто</button>
+            <table>
+                <thead><tr><th>Марка</th><th>Модель</th><th>Клас</th><th>Рік</th><th>Номер</th><th style="width:120px;">Дії</th></tr></thead>
+                <tbody id="cars-table"></tbody>
+            </table>
+        </div>
+
+        <div id="customers" class="section">
+            <button class="btn-add" onclick="openAddCustomer()">➕ Додати клієнта</button>
+            <table>
+                <thead><tr><th>ID</th><th>ПІБ</th><th>Посвідчення</th><th>Телефон</th><th style="width:120px;">Дії</th></tr></thead>
+                <tbody id="customers-table"></tbody>
+            </table>
+        </div>
+
+        <div id="orders" class="section">
+            <table>
+                <thead><tr><th>ID</th><th>Дата початку</th><th>Дата кінця</th><th>Сума</th><th>Статус оплати</th><th style="width:120px;">Дії</th></tr></thead>
+                <tbody id="orders-table"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="overlay" class="overlay"></div>
+
+    <div id="brandModal" class="modal">
+        <h3 id="brandModalTitle">Марка авто</h3>
+        <input type="hidden" id="edit-brand-id">
+        <input type="text" id="add-brand-name" placeholder="Назва марки" required>
+        <button onclick="saveBrand()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Зберегти</button>
+        <button onclick="closeModal('brandModal')" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <div id="classModal" class="modal">
+        <h3 id="classModalTitle">Клас авто</h3>
+        <input type="hidden" id="edit-class-id">
+        <input type="text" id="add-class-name" placeholder="Назва класу" required>
+        <input type="number" step="0.01" id="add-class-rate" placeholder="Базова ціна" required>
+        <button onclick="saveCarClass()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Зберегти</button>
+        <button onclick="closeModal('classModal')" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <div id="carModal" class="modal">
+        <h3 id="carModalTitle">Автомобіль</h3>
+        <input type="hidden" id="edit-car-id">
+        <select id="add-car-brandId" required><option value="">Оберіть марку...</option></select>
+        <input type="text" id="add-car-model" placeholder="Модель" required>
+        <select id="add-car-classId" required><option value="">Оберіть клас...</option></select>
+        <input type="number" id="add-car-year" placeholder="Рік" required>
+        <input type="text" id="add-car-plate" placeholder="Номерний знак" required>
+        <button onclick="saveCar()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Зберегти</button>
+        <button onclick="closeModal('carModal')" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <div id="custModal" class="modal">
+        <h3 id="custModalTitle">Клієнт</h3>
+        <input type="hidden" id="edit-cust-id">
+        <input type="text" id="edit-cust-name" placeholder="ПІБ" required>
+        <input type="text" id="edit-cust-license" placeholder="Посвідчення" required>
+        <input type="text" id="edit-cust-phone" placeholder="Телефон" required>
+        <button onclick="saveCustomer()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Зберегти</button>
+        <button onclick="closeModal('custModal')" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <div id="orderModal" class="modal">
+        <h3>Редагувати замовлення</h3>
+        <input type="hidden" id="edit-order-id">
+        <input type="hidden" id="edit-order-carId">
+        <input type="hidden" id="edit-order-custId">
+        <p style="margin-bottom: 5px;">Дата початку:</p>
+        <input type="date" id="edit-order-start" required>
+        <p style="margin-bottom: 5px;">Дата завершення:</p>
+        <input type="date" id="edit-order-end" required>
+        <input type="number" step="0.01" id="edit-order-amount" placeholder="Сума до оплати" required>
+        <button onclick="saveOrder()" style="background:#2ecc71; width: 100%; margin-bottom: 10px;">Зберегти</button>
+        <button onclick="closeModal('orderModal')" style="background:#e74c3c; width: 100%;">Скасувати</button>
+    </div>
+
+    <script src="js/admin.js" asp-append-version="true"></script>
+</body>
+</html>

@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using CarRentalAPI.Models;
@@ -20,70 +18,72 @@ namespace CarRentalAPI.Controllers
             _context = context;
         }
 
-        // GET: api/Cars
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Car>>> GetCars()
         {
-            return await _context.Cars.ToListAsync();
+            var cars = await _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarClass)
+                .ToListAsync();
+
+            return Ok(cars);
         }
 
-        // GET: api/Cars/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Car>> GetCar(int id)
         {
-            var car = await _context.Cars.FindAsync(id);
+            var car = await _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarClass)
+                .FirstOrDefaultAsync(c => c.Id == id);
 
             if (car == null)
             {
                 return NotFound();
             }
 
-            return car;
+            return Ok(car);
         }
 
-        // PUT: api/Cars/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutCar(int id, Car car)
+
+        [HttpGet("search")]
+        public async Task<ActionResult<IEnumerable<Car>>> SearchCars(string query)
         {
-            if (id != car.Id)
+            if (string.IsNullOrWhiteSpace(query))
             {
-                return BadRequest();
+                return await GetCars();
             }
 
-            _context.Entry(car).State = EntityState.Modified;
+            var lowerQuery = query.ToLower();
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!CarExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
 
-            return NoContent();
+            var filteredCars = await _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarClass)
+                .Where(c => c.Model.ToLower().Contains(lowerQuery) ||
+                            (c.Brand != null && c.Brand.Name.ToLower().Contains(lowerQuery)))
+                .ToListAsync();
+
+            return Ok(filteredCars);
         }
 
-        // POST: api/Cars
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
         public async Task<ActionResult<Car>> PostCar(Car car)
         {
             _context.Cars.Add(car);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction("GetCar", new { id = car.Id }, car);
+  
+            var newCar = await _context.Cars
+                .Include(c => c.Brand)
+                .Include(c => c.CarClass)
+                .FirstOrDefaultAsync(c => c.Id == car.Id);
+
+            return CreatedAtAction("GetCar", new { id = car.Id }, newCar);
         }
 
-        // DELETE: api/Cars/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCar(int id)
         {
@@ -97,11 +97,6 @@ namespace CarRentalAPI.Controllers
             await _context.SaveChangesAsync();
 
             return NoContent();
-        }
-
-        private bool CarExists(int id)
-        {
-            return _context.Cars.Any(e => e.Id == id);
         }
     }
 }
